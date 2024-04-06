@@ -1,22 +1,38 @@
-import React from "react";
+import { usePathname } from "next/navigation";
+import React, { useState,type MouseEvent } from "react";
 
 type formInputType = {
   label: string;
+  name:string;
   value?: string | number;
   type: string;
 };
 
-const FormInput = ({ label, value, type }: formInputType): React.JSX.Element => {
+const FormInput = ({ label, name, value, type }: formInputType): React.JSX.Element => {
+
+    const [show,setShow] = useState(false)
+    const pathName = usePathname()
+    const isLoginPage = pathName.includes('login')
+    console.log("🚀 ~ FormInput ~ pathName:", pathName)
+
+    const handleShowClick = (e:MouseEvent<HTMLButtonElement>) =>{
+        e.preventDefault()
+        setShow(!show)
+    }
+
   return (
     <div className="flex  w-[456px]  flex-col">
-      <label htmlFor="name">{label}</label>
+      <label className='py-1' htmlFor={name}>{label}</label>
+      <div className="relative">
       <input
-        className="h-12 px-3.5 py-3 border rounded-md border-[#C1C1C1]"
+        className="h-12 px-3.5 py-3 border  w-full rounded-md border-[#C1C1C1]"
         placeholder="Enter"
-        type={type}
-        name="name"
+        type={show?'text':type}
+        name={name}
         value={value}
       />
+      {type==='password' && isLoginPage &&<button onClick={handleShowClick} className="absolute inset-y-0 right-0 pr-3.5 underline decoration-1 font-normal ">Show</button>}
+      </div>
     </div>
   );
 };
