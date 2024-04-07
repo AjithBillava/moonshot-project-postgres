@@ -1,13 +1,14 @@
 import Head from "next/head";
-import Link from "next/link";
 
 import { api } from "~/utils/api";
 import LoginPage from "./login";
 
 export default function Home() {
-  const hello = api.post.hello.useQuery({ text: "from tRPC" });
+  // const hello = api.post.hello.useQuery({ text: "from tRPC" });
   // const newD = api.post.create.useMutation()
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const categories = api.category.getCategories
+  console.log("🚀 ~ Home ~ categories:", categories)
   return (
     <>
       <Head>

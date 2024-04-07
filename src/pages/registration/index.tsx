@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
-import FormInput from '~/components/formInput'
+import FormInputTextbox from '~/components/formInput'
 
 
 
@@ -13,12 +13,12 @@ function RegistrationPage() {
         <h1 className='text-3xl font-semibold pb-4' >Create your account</h1>
 
         <div className='flex flex-col gap-6'>
-        <FormInput label='Name' name='name'  type='text' />
+        <FormInputTextbox label='Name' name='name'  type='text' />
         
 
-        <FormInput label='Email' name='email' type='email' />
+        <FormInputTextbox label='Email' name='email' type='email' />
         
-        <FormInput label='Password' name='paswword' type='password' />
+        <FormInputTextbox label='Password' name='paswword' type='password' />
 
         <button className="flex justify-center items-center bg-black text-white h-12 rounded-md tracking-wide" >CREATE ACCOUNT</button>
         </div>

@@ -32,9 +32,9 @@ const OfferCarousel = () => {
         }
     }
   return (
-    <div className="relative flex items-center justify-center h-[17px] gap-20 bg-[#F4F4F4] ">
+    <div className="relative flex items-center justify-center h-[20px] gap-20 bg-[#F4F4F4] ">
       <Image className="object-contain" onClick={handleBackwardClick} role="button" alt="backward-arrow" src={"/Backward-arrow.png"} width={8} height={8} style={{height:'10px'}} />
-        <span className="text-sm font-medium" >{offer}</span>
+        <span className="text-sm font-medium w-64 flex justify-center" >{offer}</span>
       <Image className="object-contain" onClick={handleForwardClick} role="button" alt="forward-arrow" src={"/Forward-arrow.png"} width={8} height={8} style={{height:'10px'}} />
     </div>
   );

@@ -1,19 +1,19 @@
 import { usePathname } from "next/navigation";
 import React, { useState,type MouseEvent } from "react";
 
-type formInputType = {
+type FormInputTextboxType = {
   label: string;
   name:string;
   value?: string | number;
   type: string;
 };
 
-const FormInput = ({ label, name, value, type }: formInputType): React.JSX.Element => {
+const FormInputTextbox = ({ label, name, value, type }: FormInputTextboxType): React.JSX.Element => {
 
     const [show,setShow] = useState(false)
     const pathName = usePathname()
     const isLoginPage = pathName.includes('login')
-    console.log("🚀 ~ FormInput ~ pathName:", pathName)
+    console.log("🚀 ~ FormInputTextbox ~ pathName:", pathName)
 
     const handleShowClick = (e:MouseEvent<HTMLButtonElement>) =>{
         e.preventDefault()
@@ -28,6 +28,7 @@ const FormInput = ({ label, name, value, type }: formInputType): React.JSX.Eleme
         className="h-12 px-3.5 py-3 border  w-full rounded-md border-[#C1C1C1]"
         placeholder="Enter"
         type={show?'text':type}
+        id={name}
         name={name}
         value={value}
       />
@@ -37,4 +38,4 @@ const FormInput = ({ label, name, value, type }: formInputType): React.JSX.Eleme
   );
 };
 
-export default FormInput;
+export default FormInputTextbox;

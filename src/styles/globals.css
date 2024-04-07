@@ -17,3 +17,17 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+/* input[type="checkbox"]::before{
+    background-color:green;
+    accent-color: #000000
+    } */
+
+input[type="checkbox"] {
+    width: 25px;
+    height: 25px;
+    border-radius: 20px;
+    background-color: #CCCCCC !important;
+    accent-color: #000000;
+    color: #FFFFFF;
+  }
+  

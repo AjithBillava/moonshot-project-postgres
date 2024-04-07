@@ -1,10 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Link from 'next/link'
-import React from 'react'
-import FormInput from '~/components/formInput'
+import React, { useEffect } from 'react'
+import FormInputTextbox from '~/components/formInput'
+import { api } from '~/utils/api'
+// import { getCategories } from '../api/categories'
 
 
 
 const LoginPage = () => {
+
+  const categories = api.category.getCategories.useQuery()
+
+
+  console.log("🚀 ~ Home ~ categories:", categories)
   return (
     <div className='flex justify-center  ' >
     <form method='post' className='flex  items-center  flex-col w-[36rem]  border rounded-[20px] border-[#C1C1C1] mt-10 px-[3.75rem] py-10' >
@@ -16,9 +26,9 @@ const LoginPage = () => {
       <div className='flex flex-col gap-6'>
       
 
-      <FormInput label='Email' name='email' type='email' />
+      <FormInputTextbox label='Email' name='email' type='email' />
       
-      <FormInput label='Password' name='password'  type='password' />
+      <FormInputTextbox label='Password' name='password'  type='password' />
 
       <button className="flex justify-center items-center bg-black text-white h-12 mt-4 rounded-md tracking-wide" >LOGIN</button>
       </div>
