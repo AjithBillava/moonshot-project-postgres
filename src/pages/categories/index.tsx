@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -5,7 +8,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Pagination from "~/components/paginationController";
 import { api } from "~/utils/api";
-import withAuth, { withAuthentication } from "~/utils/withAuth";
+// import withAuth from "~/utils/withAuth";
 import { AppContext } from "../AppContext";
 // import { getCategories } from '../api/categories'
 
@@ -17,7 +20,7 @@ const CategoryPage = () => {
   const [selectedCategories,setSelectedCategories] = useState<string[]>([])
   
   useEffect(()=>{
-    const userCategories =user?.categories.map(item=>item.name);
+    const userCategories =user?.categories.map((item: { name: any; })=>item.name);
 
     setSelectedCategories(userCategories)
   },[setSelectedCategories, user?.categories])
@@ -30,7 +33,7 @@ const CategoryPage = () => {
   const totalCount = api.category.getTotalCount.useQuery().data;
   const totalNumberOfPages = totalCount ? parseInt(`${totalCount / 6}`) : 1;
 
-  const handleCheckboxClick = (e:React.ChangeEventHandler<HTMLInputElement>) => {
+  const handleCheckboxClick = (e:React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const isChecked = e.target.checked;
       const newSelectedValues = [...selectedCategories]; // Copy to avoid mutation
@@ -38,7 +41,7 @@ const CategoryPage = () => {
       if (isChecked) {
         newSelectedValues.push(value);
         userRouteAddCategories.mutate({userId:parseInt(user.id),categoryId:parseInt(e.target.id)});
-        console.log(e.target.id);
+        
       } else {
         newSelectedValues.splice(newSelectedValues.indexOf(value), 1);
         userRouteRemoveCategories.mutate({userId:parseInt(user.id),categoryId:parseInt(e.target.id)});

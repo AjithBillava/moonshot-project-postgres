@@ -11,7 +11,7 @@ export const AppContext = createContext<initialStateType>({
   user: undefined,
   setUser: (user: any) => {},
 });
-const AppProvider = ({ children }) => {
+const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userState, setUserState] = useState(undefined);
 
   return (
