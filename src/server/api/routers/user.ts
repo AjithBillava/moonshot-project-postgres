@@ -1,15 +1,38 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { z } from "zod";
-import { hash } from "bcryptjs";
-
+import { compare, hash } from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { env } from "~/env";
+
+const secret_key = env.NEXT_PUBLIC_JWT_TOKEN;
 
 export const userRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
+  getUser: publicProcedure
+    .input(z.object({ email: z.string(), password: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { email, password } = input;
+
+      const user = await ctx.db.user.findUnique({
+        where: { email },
+        include: { categories: true },
+      });
+
+      if (!user) {
+        throw new Error("Invalid email or password");
+      }
+
+      const validPassword = await compare(password, user.password);
+
+      if (!validPassword) {
+        throw new Error("Invalid email or password");
+      }
+      const {password:pwd, ...userWithoutPassword} = user
+
+      const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
+
+      return { message: "logged in successfuly", token: token, user:userWithoutPassword };
     }),
 
   createUser: publicProcedure
@@ -21,20 +44,102 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { name, email, password } = input;
+      // let token;
+      const user = await ctx.db.user.findUnique({
+        where: { email },
+      });
 
-      const {name,email,password} = input
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const hashedPassword = await hash(password, 10) ; 
+      if (user) {
+        throw new Error("User already exist");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      // hash(password, 10,async function (_err, res) {
+      //   await ctx.db.user.create({
+      //     data: {
+      //       name: name,
+      //       email: email,
+      //       password: res,
+      //     },
+      //   }).then(()=>{
+      // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      //      token = jwt.sign(input, "biryani", { expiresIn: "4h" }) as string;
 
+      //   });
+      // })
+
+      const hashedPassword = await hash(password, 10);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
+      console.log("name,email,password", name, email, token);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      return ctx.db.user.create({
+      const result = await ctx.db.user.create({
         data: {
           name: name,
           email: email,
-          password: hashedPassword
+          password: hashedPassword,
         },
       });
+
+
+      const {password:pwd, ...userWithoutPassword} = result
+
+      // console.log("name,email,password", name, email, token);
+
+      return { message: "user created", token: token, user:userWithoutPassword };
     }),
 
+  addCategories: publicProcedure
+    .input(z.object({ categoryId: z.number(), userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { categoryId, userId } = input;
+
+        const user = await ctx.db.user.update({
+          where: { id: userId },
+          data: {
+            categories: {
+              connect: {
+                id: categoryId,
+              },
+            },
+          },
+        });
+        console.log("🚀 ~ .mutation ~ user:", user);
+
+        return { message: "Category added successfully!" };
+      } catch (error) {
+        console.error("Error adding category to user:", error);
+        throw new Error("Failed to add category to user");
+      }
+      // user.
+    }),
+
+    removeCategories: publicProcedure
+    .input(z.object({ categoryId: z.number(), userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { categoryId, userId } = input;
+
+        const user = await ctx.db.user.update({
+          where: { id: userId },
+          data: {
+            categories: {
+              disconnect: {
+                id: categoryId,
+              },
+            },
+          },
+        });
+        console.log("🚀 ~ .mutation ~ user:", user);
+
+        return { message: "Category added successfully!" };
+      } catch (error) {
+        console.error("Error adding category to user:", error);
+        throw new Error("Failed to add category to user");
+      }
+      // user.
+    }),
 });
