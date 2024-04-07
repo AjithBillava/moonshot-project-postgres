@@ -10,11 +10,6 @@ import { api } from '~/utils/api'
 
 
 const LoginPage = () => {
-
-  const categories = api.category.getCategories.useQuery()
-
-
-  console.log("🚀 ~ Home ~ categories:", categories)
   return (
     <div className='flex justify-center  ' >
     <form method='post' className='flex  items-center  flex-col w-[36rem]  border rounded-[20px] border-[#C1C1C1] mt-10 px-[3.75rem] py-10' >
