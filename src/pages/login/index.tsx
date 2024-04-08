@@ -21,7 +21,6 @@ const LoginPage = () => {
 
   useEffect(() => {
     const { data } = userRoute;
-    console.log("🚀 ~ useEffect ~ data:", userRoute.error?.message);
     if (userRoute.isError) {
       setError(userRoute?.error?.message)
     }
@@ -29,6 +28,7 @@ const LoginPage = () => {
     if (data?.token) {
       setUser(data.user as unknown as userType);
       localStorage.setItem("token", data?.token);
+      localStorage.setItem("user", JSON.stringify(data?.user)); 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push("/categories");
 
@@ -40,7 +40,6 @@ const LoginPage = () => {
     e.preventDefault();
     userRoute.mutate({ email, password });
 
-    // console.log("🚀 ~ handleLoginSubmit ~ result:", userRoute.data)
   };
 
   return (

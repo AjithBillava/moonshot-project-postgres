@@ -58,7 +58,6 @@ export const userRouter = createTRPCRouter({
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
-      console.log("name,email,password", name, email, token);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const result = await ctx.db.user.create({
@@ -81,7 +80,7 @@ export const userRouter = createTRPCRouter({
       try {
         const { categoryId, userId } = input;
 
-        const user = await ctx.db.user.update({
+         await ctx.db.user.update({
           where: { id: userId },
           data: {
             categories: {
@@ -91,7 +90,6 @@ export const userRouter = createTRPCRouter({
             },
           },
         });
-        console.log("🚀 ~ .mutation ~ user:", user);
 
         return { message: "Category added successfully!" };
       } catch (error) {
@@ -107,7 +105,7 @@ export const userRouter = createTRPCRouter({
       try {
         const { categoryId, userId } = input;
 
-        const user = await ctx.db.user.update({
+        await ctx.db.user.update({
           where: { id: userId },
           data: {
             categories: {
@@ -117,12 +115,10 @@ export const userRouter = createTRPCRouter({
             },
           },
         });
-        console.log("🚀 ~ .mutation ~ user:", user);
-
-        return { message: "Category added successfully!" };
+        return { message: "Category removed successfully!" };
       } catch (error) {
-        console.error("Error adding category to user:", error);
-        throw new Error("Failed to add category to user");
+        console.error("Error removing category to user:", error);
+        throw new Error("Failed to remove category to user");
       }
       // user.
     }),

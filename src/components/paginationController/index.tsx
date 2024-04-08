@@ -14,16 +14,10 @@ const Pagination = ({
   const [endIndex, setEndIndex] = useState(noOfPagesAtTime);
   const pageNumbers = [...Array(totalPages + 1).keys()].slice(1);
 
-  //   const startIndex = (itemsPerPage - 1) * itemsPerPage;
-  //   const endIndex = startIndex + itemsPerPage;
-  //   const [listLength, setListLength] = useState(7);
-
-  console.log("🚀 ~ startindex:", startindex);
-
   const goToPreviousPage = () => {
     // e.preventDefault();
     setStartindex(startindex <= 0 ? 0 : startindex - noOfPagesAtTime);
-    setEndIndex(startindex<= 0 ?noOfPagesAtTime:startindex);
+    setEndIndex(startindex <= 0 ? noOfPagesAtTime : startindex);
   };
   const goToForwardPage = () => {
     // e.preventDefault();
@@ -33,22 +27,21 @@ const Pagination = ({
 
   const goToNextPage = () => {
     if (currentPage !== totalPages) setCurrentPage(currentPage + 1);
-    if(currentPage>=endIndex) goToForwardPage()
+    if (currentPage >= endIndex) goToForwardPage();
   };
   const goToPrevPage = () => {
     if (currentPage !== 1) setCurrentPage(currentPage - 1);
-    if(currentPage<=startindex) goToPreviousPage()
-
+    if (currentPage <= startindex) goToPreviousPage();
   };
   return (
     <nav>
       <ul className="flex gap-2">
-        <li >
+        <li>
           <a className="text-[#ACACAC]" href="#" onClick={goToPreviousPage}>
             {`<<`}
           </a>
         </li>
-        <li >
+        <li>
           <a className="text-[#ACACAC]" onClick={goToPrevPage} href="#">
             {`<`}
           </a>
@@ -60,23 +53,26 @@ const Pagination = ({
           >
             <a
               onClick={() => setCurrentPage(pgNumber)}
-              className={currentPage===pgNumber?'font-bold':'text-[#ACACAC]'}
+              className={
+                currentPage === pgNumber ? "font-bold" : "text-[#ACACAC]"
+              }
               href="#"
             >
               {pgNumber}
             </a>
           </li>
         ))}
-        <li >
-            
-            <span className="text-[#ACACAC] pr-1">{endIndex>=totalPages?'':'...'}</span>
-            
+        <li>
+          <span className="pr-1 text-[#ACACAC]">
+            {endIndex >= totalPages ? "" : "..."}
+          </span>
+
           <a className="text-[#ACACAC]" onClick={goToNextPage} href="#">
             {`>`}
           </a>
         </li>
 
-        <li >
+        <li>
           <a className="text-[#ACACAC]" href="#" onClick={goToForwardPage}>
             {`>>`}
           </a>

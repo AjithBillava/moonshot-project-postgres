@@ -18,7 +18,6 @@ function RegistrationPage() {
 
   useEffect(() => {
     const { data } = userRoute;
-    console.log("🚀 ~ useEffect ~ userRoute:");
 
     if (password.length > 8 && name.length !== 0) {
       if (userRoute.isError) {

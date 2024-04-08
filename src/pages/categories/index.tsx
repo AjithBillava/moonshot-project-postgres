@@ -19,7 +19,7 @@ const CategoryPage = () => {
   const userRouteRemoveCategories = api.user.removeCategories.useMutation();
   const { user } = useContext(AppContext);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
+  
   useEffect(() => {
     if (user) {
       const userCategories:string[] | undefined = user?.categories?.map(
