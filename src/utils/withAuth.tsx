@@ -15,7 +15,7 @@ const secret_key = env.NEXT_PUBLIC_JWT_TOKEN;
 
 type WithAuthProps<T> = T & { user?: DecodedToken }; // Optional user for flexibility
 
-const withAuth = <T extends {}>(
+const withAuth = <T extends object>(
   WrappedComponent: React.FC<WithAuthProps<T>>,
 ) => {
   const Component = (props: WithAuthProps<T>) => {
@@ -28,9 +28,7 @@ const withAuth = <T extends {}>(
         router.replace("/login"); // Redirect to login if not authenticated
       } else {
         try {
-          console.log("🚀 ~ secret_key:", token, secret_key);
-
-          debugger;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
           jwt.verify(token, secret_key, (err) => {
             if (err) {
               router.replace("/login"); // Redirect to login if token is invalid
