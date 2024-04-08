@@ -18,7 +18,7 @@ function RegistrationPage() {
 
   useEffect(() => {
     const { data } = userRoute;
-    console.log("🚀 ~ useEffect ~ userRoute:")
+    console.log("🚀 ~ useEffect ~ userRoute:");
 
     if (password.length > 8 && name.length !== 0) {
       if (userRoute.isError) {
@@ -37,14 +37,12 @@ function RegistrationPage() {
 
   const handleRegistrationSubmit = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    if (password.length < 8) {
+    if (name.length === 0) {
+      setError("Name length be minimum of 1");
+    } else if (password.length < 8) {
       setError("Password length be minimum of 8");
-    }
-    else if (name.length === 0) {
-      setError("name length be minimum of 1");
     } else {
-      setError("")
+      setError("");
       userRoute.mutate({ name: name, email: email, password: password });
     }
   };
@@ -91,7 +89,7 @@ function RegistrationPage() {
             CREATE ACCOUNT
           </button>
         </div>
-        <div className="h-8">
+        <div className="h-8 mt-4">
           {error && <p className=" text-center text-red-400 ">{error}</p>}
         </div>
 
