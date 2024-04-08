@@ -30,12 +30,6 @@ export const AppContext = createContext<initialStateType>({
 const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userState, setUserState] = useState<userType | undefined>(undefined);
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const localUser: userType = JSON.parse(localStorage.getItem("user")!);
-
-    userState ?? setUserState(localUser);
-  }, [userState]);
 
   return (
     <AppContext.Provider

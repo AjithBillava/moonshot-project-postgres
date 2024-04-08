@@ -28,11 +28,15 @@ export const userRouter = createTRPCRouter({
       if (!validPassword) {
         throw new Error("Invalid email or password");
       }
-      const {password:pwd, ...userWithoutPassword} = user
+      const { password: pwd, ...userWithoutPassword } = user;
 
       const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
 
-      return { message: "logged in successfuly", token: token, user:userWithoutPassword };
+      return {
+        message: "logged in successfuly",
+        token: token,
+        user: userWithoutPassword,
+      };
     }),
 
   createUser: publicProcedure
@@ -53,7 +57,7 @@ export const userRouter = createTRPCRouter({
       if (user) {
         throw new Error("User already exist");
       }
-     
+
       const hashedPassword = await hash(password, 10);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -68,10 +72,13 @@ export const userRouter = createTRPCRouter({
         },
       });
 
+      const { password: pwd, ...userWithoutPassword } = result;
 
-      const {password:pwd, ...userWithoutPassword} = result
-
-      return { message: "user created", token: token, user:userWithoutPassword };
+      return {
+        message: "user created",
+        token: token,
+        user: userWithoutPassword,
+      };
     }),
 
   addCategories: publicProcedure
@@ -80,7 +87,7 @@ export const userRouter = createTRPCRouter({
       try {
         const { categoryId, userId } = input;
 
-         await ctx.db.user.update({
+        const user = await ctx.db.user.update({
           where: { id: userId },
           data: {
             categories: {
@@ -91,7 +98,7 @@ export const userRouter = createTRPCRouter({
           },
         });
 
-        return { message: "Category added successfully!" };
+        return { message: "Category added successfully!", data: user };
       } catch (error) {
         console.error("Error adding category to user:", error);
         throw new Error("Failed to add category to user");
@@ -99,13 +106,13 @@ export const userRouter = createTRPCRouter({
       // user.
     }),
 
-    removeCategories: publicProcedure
+  removeCategories: publicProcedure
     .input(z.object({ categoryId: z.number(), userId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       try {
         const { categoryId, userId } = input;
 
-        await ctx.db.user.update({
+        const user = await ctx.db.user.update({
           where: { id: userId },
           data: {
             categories: {
@@ -115,7 +122,7 @@ export const userRouter = createTRPCRouter({
             },
           },
         });
-        return { message: "Category removed successfully!" };
+        return { message: "Category removed successfully!", data: user };
       } catch (error) {
         console.error("Error removing category to user:", error);
         throw new Error("Failed to remove category to user");

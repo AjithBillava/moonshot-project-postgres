@@ -27,8 +27,7 @@ const LoginPage = () => {
 
     if (data?.token) {
       setUser(data.user as unknown as userType);
-      localStorage.setItem("token", data?.token);
-      localStorage.setItem("user", JSON.stringify(data?.user)); 
+      localStorage.setItem("token", data?.token); 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push("/categories");
 
