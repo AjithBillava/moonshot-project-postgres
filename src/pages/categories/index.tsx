@@ -30,7 +30,7 @@ const CategoryPage = () => {
     }
   }, [setSelectedCategories, user]);
 
-  const { data: categoriesArray } = api.category.getCategories.useQuery({
+  const { data: categoriesArray, isLoading } = api.category.getCategories.useQuery({
     skip: (currentPage - 1) * 6,
     take: 6,
   });
@@ -74,12 +74,12 @@ const CategoryPage = () => {
             Please mark your interests!
           </h1>
 
-          <h4 className="mb-6">We will keep you notified.</h4>
+          <h4 className="mt-4">We will keep you notified.</h4>
         </div>
         <div className="mb-14 flex flex-col gap-6">
           <h2 className="mt-8 text-2xl font-medium">My Saved Interests</h2>
 
-          {categoriesArray?.map((category) => (
+          {!isLoading && categoriesArray?.map((category) => (
             <div className="flex gap-4 " key={category.id}>
               <input
                 checked={selectedCategories?.includes(`${category.name}`)}
@@ -93,6 +93,8 @@ const CategoryPage = () => {
               <label htmlFor={`${category.id}`}>{category.name}</label>
             </div>
           ))}
+
+          {isLoading && <div className=" text-2xl h-60">Loading....</div>}
         </div>
 
         <Pagination
