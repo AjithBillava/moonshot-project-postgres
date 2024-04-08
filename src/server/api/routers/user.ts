@@ -28,15 +28,11 @@ export const userRouter = createTRPCRouter({
       if (!validPassword) {
         throw new Error("Invalid email or password");
       }
-      const { password: pwd, ...userWithoutPassword } = user;
+      const {password:pwd, ...userWithoutPassword} = user
 
       const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
 
-      return {
-        message: "logged in successfuly",
-        token: token,
-        user: userWithoutPassword,
-      };
+      return { message: "logged in successfuly", token: token, user:userWithoutPassword };
     }),
 
   createUser: publicProcedure
@@ -49,48 +45,34 @@ export const userRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { name, email, password } = input;
-        // let token;
-        const user = await ctx.db.user.findUnique({
-          where: { email },
-        });
+      // let token;
+      const user = await ctx.db.user.findUnique({
+        where: { email },
+      });
 
-        if (user) {
-          throw new Error("User already exist");
-        }
-
-      try {
-        
-        const hashedPassword = await hash(password, 10);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
-        console.log("name,email,password", name, email, token);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        await ctx.db.user.create({
-          data: {
-            name: name,
-            email: email,
-            password: hashedPassword,
-          },
-        }).then(data=>{
-          const { password: pwd, ...userWithoutPassword } = data;
-
-          return {
-            message: "user created",
-            token: token,
-            user: userWithoutPassword,
-          };
-        }).catch(error=>{
-        console.error("Error creating user:", error);
-
-        })
-
-        
-      } catch (error) {
-        console.error("Error creating user:", error);
-        throw new Error(`Error creating user {}`);
+      if (user) {
+        throw new Error("User already exist");
       }
+     
+      const hashedPassword = await hash(password, 10);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
+      console.log("name,email,password", name, email, token);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const result = await ctx.db.user.create({
+        data: {
+          name: name,
+          email: email,
+          password: hashedPassword,
+        },
+      });
+
+
+      const {password:pwd, ...userWithoutPassword} = result
+
+      return { message: "user created", token: token, user:userWithoutPassword };
     }),
 
   addCategories: publicProcedure
@@ -119,7 +101,7 @@ export const userRouter = createTRPCRouter({
       // user.
     }),
 
-  removeCategories: publicProcedure
+    removeCategories: publicProcedure
     .input(z.object({ categoryId: z.number(), userId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       try {
