@@ -10,6 +10,7 @@ import Pagination from "~/components/paginationController";
 import { api } from "~/utils/api";
 // import withAuth from "~/utils/withAuth";
 import { AppContext, userType } from "../AppContext";
+import withAuth from "~/utils/withAuth";
 // import { getCategories } from '../api/categories'
 
 const CategoryPage = () => {
@@ -27,7 +28,7 @@ const CategoryPage = () => {
 
       userCategories && setSelectedCategories(userCategories);
     }
-  }, [setSelectedCategories, user?.categories]);
+  }, [setSelectedCategories, user]);
 
   const { data: categoriesArray } = api.category.getCategories.useQuery({
     skip: (currentPage - 1) * 6,
@@ -104,4 +105,4 @@ const CategoryPage = () => {
   );
 };
 
-export default CategoryPage;
+export default withAuth( CategoryPage);

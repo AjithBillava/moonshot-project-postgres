@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import jwt from "jsonwebtoken";
+import {verify } from "jsonwebtoken";
 import { env } from "~/env";
 
 interface DecodedToken {
@@ -28,8 +28,7 @@ const withAuth = <T extends object>(
         router.replace("/login"); // Redirect to login if not authenticated
       } else {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          jwt.verify(token, secret_key, (err) => {
+          verify(token, secret_key, (err) => {
             if (err) {
               router.replace("/login"); // Redirect to login if token is invalid
             }
