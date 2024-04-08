@@ -1,18 +1,34 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useState } from "react";
 
+export type categoriesType = {
+  id: string;
+  name: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
 
-type initialStateType={
-    user?: any;
-    setUser: (user: any | undefined) => void;
-}
+export type userType = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  categories?: categoriesType[];
+};
+
+type initialStateType = {
+  user?: userType | undefined;
+  setUser: (user: userType | undefined) => void;
+};
 
 export const AppContext = createContext<initialStateType>({
   user: undefined,
-  setUser: (user: any) => {},
+  setUser: (user: userType | undefined) => {},
 });
 const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userState, setUserState] = useState(undefined);
+  const [userState, setUserState] = useState<userType | undefined>(undefined);
 
   return (
     <AppContext.Provider

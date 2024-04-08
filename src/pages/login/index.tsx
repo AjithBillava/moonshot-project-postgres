@@ -8,28 +8,26 @@ import { useRouter } from "next/router";
 import React, { MouseEvent, useContext, useEffect, useState } from "react";
 import FormInput from "~/components/formInput";
 import { api } from "~/utils/api";
-import { AppContext } from "../AppContext";
+import { AppContext, userType } from "../AppContext";
 // import { getCategories } from '../api/categories'
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const userRoute = api.user.getUser.useMutation();
   const router = useRouter();
-  const {setUser} = useContext(AppContext)
+  const { setUser } = useContext(AppContext);
 
-  // useEffect(()=>{
-  //   const localToken = localStorage.getItem("token");
-  //   if (localToken) {
-  //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  //     router.push("/categories");
-  //     return;
-  //   }
-  // })
   useEffect(() => {
     const { data } = userRoute;
+    console.log("🚀 ~ useEffect ~ data:", userRoute.error?.message);
+    if (userRoute.isError) {
+      setError(userRoute?.error?.message)
+    }
+
     if (data?.token) {
-      setUser(data.user)
+      setUser(data.user as unknown as userType);
       localStorage.setItem("token", data?.token);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       router.push("/categories");
@@ -79,18 +77,19 @@ const LoginPage = () => {
           >
             LOGIN
           </button>
+          <div className="h-8">
+          {error && <p className=" text-center text-red-400 ">{error}</p>}
+          </div>
+
         </div>
 
-        <p className="mt-8 flex w-full justify-center gap-2 border-t-2 pt-6 text-sm text-[#333333]">
+        <p className=" flex w-full justify-center gap-2 border-t-2 pt-6 text-sm text-[#333333]">
           Don&apos;t have an Account?
           <Link href={"/registration"} className="font-medium tracking-wider">
             SIGN UP
           </Link>
         </p>
 
-        {/* <label htmlFor='name'>Name</label>
-        <input className='h-12 px-3.5 py-3' placeholder='Enter' type='text' name='name'/> */}
-        {/* </div> */}
       </form>
     </div>
   );

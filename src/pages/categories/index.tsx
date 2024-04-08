@@ -9,21 +9,25 @@ import React, { useContext, useEffect, useState } from "react";
 import Pagination from "~/components/paginationController";
 import { api } from "~/utils/api";
 // import withAuth from "~/utils/withAuth";
-import { AppContext } from "../AppContext";
+import { AppContext, userType } from "../AppContext";
 // import { getCategories } from '../api/categories'
 
 const CategoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const userRouteAddCategories = api.user.addCategories.useMutation();
   const userRouteRemoveCategories = api.user.removeCategories.useMutation();
-  const { user} = useContext(AppContext);
-  const [selectedCategories,setSelectedCategories] = useState<string[]>([])
-  
-  useEffect(()=>{
-    const userCategories =user?.categories.map((item: { name: any; })=>item.name);
+  const { user } = useContext(AppContext);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    setSelectedCategories(userCategories)
-  },[setSelectedCategories, user?.categories])
+  useEffect(() => {
+    if (user) {
+      const userCategories:string[] | undefined = user?.categories?.map(
+        (item) => item?.name,
+      );
+
+      userCategories && setSelectedCategories(userCategories);
+    }
+  }, [setSelectedCategories, user?.categories]);
 
   const { data: categoriesArray } = api.category.getCategories.useQuery({
     skip: (currentPage - 1) * 6,
@@ -33,26 +37,30 @@ const CategoryPage = () => {
   const totalCount = api.category.getTotalCount.useQuery().data;
   const totalNumberOfPages = totalCount ? parseInt(`${totalCount / 6}`) : 1;
 
-  const handleCheckboxClick = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckboxClick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const isChecked = e.target.checked;
-      const newSelectedValues = [...selectedCategories]; // Copy to avoid mutation
-  
-      if (isChecked) {
-        newSelectedValues.push(value);
-        userRouteAddCategories.mutate({userId:parseInt(user.id),categoryId:parseInt(e.target.id)});
-        
-      } else {
-        newSelectedValues.splice(newSelectedValues.indexOf(value), 1);
-        userRouteRemoveCategories.mutate({userId:parseInt(user.id),categoryId:parseInt(e.target.id)});
+    const newSelectedValues = [...selectedCategories]; // Copy to avoid mutation
 
-      }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    setSelectedCategories(newSelectedValues)
+    if (isChecked) {
+      newSelectedValues.push(value);
+      user &&
+        userRouteAddCategories.mutate({
+          userId: parseInt(user?.id),
+          categoryId: parseInt(e.target.id),
+        });
+    } else {
+      newSelectedValues.splice(newSelectedValues.indexOf(value), 1);
+      user &&
+        userRouteRemoveCategories.mutate({
+          userId: parseInt(user?.id),
+          categoryId: parseInt(e.target.id),
+        });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    setSelectedCategories(newSelectedValues);
     // debugger;
-    
   };
-
 
   return (
     <div className="flex justify-center  ">
@@ -73,8 +81,8 @@ const CategoryPage = () => {
           {categoriesArray?.map((category) => (
             <div className="flex gap-4 " key={category.id}>
               <input
-              checked={selectedCategories?.includes(`${category.name}`)}
-                onClick={(e) =>  handleCheckboxClick(e)}
+                checked={selectedCategories?.includes(`${category.name}`)}
+                onChange={(e) => handleCheckboxClick(e)}
                 className="bg-[#CCCCCC]"
                 type="checkbox"
                 id={`${category.id}`}

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState, type MouseEvent } from "react";
 import FormInputTextbox from "~/components/formInput";
 import { api } from "~/utils/api";
-import { AppContext } from "../AppContext";
+import { AppContext, type userType } from "../AppContext";
 
 function RegistrationPage() {
   const userRoute = api.user.createUser.useMutation();
@@ -11,24 +11,41 @@ function RegistrationPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
-  const {setUser} = useContext(AppContext)
+  const [error, setError] = useState("");
 
+  const router = useRouter();
+  const { setUser } = useContext(AppContext);
 
   useEffect(() => {
     const { data } = userRoute;
-    if (data?.token) {
-      setUser(data.user)
-      localStorage.setItem("token", data?.token);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      router.push("/categories");
-      return;
+
+    if (password.length > 8 && name.length !== 0) {
+      if (userRoute.isError) {
+        !error && setError(userRoute?.error?.message);
+      }
+      if (data?.token) {
+        setUser(data.user as unknown as userType);
+        localStorage.setItem("token", data?.token);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        router.push("/categories");
+        return;
+      }
     }
-  }, [userRoute, router]);
+    // }
+  }, [userRoute, router, password, name]);
 
   const handleRegistrationSubmit = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    userRoute.mutate({name:name,email:email,password:password})
+
+    if (password.length < 8) {
+      setError("Password length be minimum of 8");
+    }
+    if (name.length === 0) {
+      setError("name length be minimum of 1");
+    } else {
+      setError("")
+      userRoute.mutate({ name: name, email: email, password: password });
+    }
   };
   // const handleOnchange()
 
@@ -68,10 +85,13 @@ function RegistrationPage() {
           <button
             type="submit"
             className="flex h-12 items-center justify-center rounded-md bg-black tracking-wide text-white"
-            onClick={(e)=>handleRegistrationSubmit(e)}
+            onClick={(e) => handleRegistrationSubmit(e)}
           >
             CREATE ACCOUNT
           </button>
+        </div>
+        <div className="h-8">
+          {error && <p className=" text-center text-red-400 ">{error}</p>}
         </div>
 
         <p className="mt-12 flex gap-2 text-sm text-[#333333]">
@@ -80,10 +100,6 @@ function RegistrationPage() {
             LOGIN
           </Link>
         </p>
-
-        {/* <label htmlFor='name'>Name</label>
-          <input className='h-12 px-3.5 py-3' placeholder='Enter' type='text' name='name'/> */}
-        {/* </div> */}
       </form>
     </div>
   );
