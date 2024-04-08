@@ -40,7 +40,7 @@ function RegistrationPage() {
     if (password.length < 8) {
       setError("Password length be minimum of 8");
     }
-    if (name.length === 0) {
+    else if (name.length === 0) {
       setError("name length be minimum of 1");
     } else {
       setError("")
