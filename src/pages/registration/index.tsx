@@ -32,6 +32,7 @@ function RegistrationPage() {
       }
     }
     // }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userRoute, router, password, name]);
 
   const handleRegistrationSubmit = (e: MouseEvent<HTMLButtonElement>) => {

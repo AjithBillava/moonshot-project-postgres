@@ -1,15 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { z } from "zod";
 import { compare, hash } from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { env } from "~/env";
-
 const secret_key = env.NEXT_PUBLIC_JWT_TOKEN;
 
 export const userRouter = createTRPCRouter({
-  getUser: publicProcedure
+  loginUser: publicProcedure
     .input(z.object({ email: z.string(), password: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const { email, password } = input;
@@ -28,9 +25,10 @@ export const userRouter = createTRPCRouter({
       if (!validPassword) {
         throw new Error("Invalid email or password");
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: pwd, ...userWithoutPassword } = user;
 
-      const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
+      const token = jwt.sign({ id: user.id }, secret_key, { expiresIn: "4h" });
 
       return {
         message: "logged in successfuly",
@@ -60,10 +58,6 @@ export const userRouter = createTRPCRouter({
 
       const hashedPassword = await hash(password, 10);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const token = jwt.sign(input, secret_key, { expiresIn: "4h" });
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const result = await ctx.db.user.create({
         data: {
           name: name,
@@ -71,7 +65,11 @@ export const userRouter = createTRPCRouter({
           password: hashedPassword,
         },
       });
+      const token = jwt.sign({ id: result.id }, secret_key, {
+        expiresIn: "4h",
+      });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: pwd, ...userWithoutPassword } = result;
 
       return {
@@ -79,6 +77,36 @@ export const userRouter = createTRPCRouter({
         token: token,
         user: userWithoutPassword,
       };
+    }),
+
+  getUser: publicProcedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const { token } = input;
+        interface tokenType extends JwtPayload {
+          id: string;
+        }
+
+        const decodedId: tokenType = jwt.verify(token, secret_key) as tokenType;
+
+        console.log("🚀 ~ .mutation ~ decodedId:", decodedId);
+        // ctx.opts.req.h
+        const result = await ctx.db.user.findUnique({
+          where: {
+            id: parseInt(decodedId.id),
+          },
+          include: { categories: true },
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...user } = result!;
+
+        return { message: "user fetched", data: user };
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        throw new Error("Failed to fectch user ");
+      }
     }),
 
   addCategories: publicProcedure

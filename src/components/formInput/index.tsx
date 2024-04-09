@@ -1,5 +1,5 @@
 import { usePathname } from "next/navigation";
-import React, { KeyboardEvent, useState,type MouseEvent } from "react";
+import React, { useState,type MouseEvent } from "react";
 
 type FormInputTextboxType = {
   label: string;
@@ -14,7 +14,6 @@ const FormInputTextbox = ({ label, name, value, type, setValue }: FormInputTextb
     const [show,setShow] = useState(false)
     const pathName = usePathname()
     const isLoginPage = pathName.includes('login')
-    console.log("🚀 ~ FormInputTextbox ~ isLoginPage:", isLoginPage)
 
     const handleShowClick = (e:MouseEvent<HTMLButtonElement>) =>{
         e.preventDefault()

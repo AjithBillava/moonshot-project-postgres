@@ -38,6 +38,7 @@ const withAuth = <T extends object>(
           router.replace("/login"); // Redirect on any error
         }
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return <WrappedComponent {...props} />;

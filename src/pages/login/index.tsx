@@ -1,21 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// import { redirect } from 'next/dist/server/api-utils'
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
-import React, { MouseEvent, useContext, useEffect, useState } from "react";
+import React, { type MouseEvent, useContext, useEffect, useState } from "react";
 import FormInput from "~/components/formInput";
 import { api } from "~/utils/api";
-import { AppContext, userType } from "../AppContext";
-// import { getCategories } from '../api/categories'
+import { AppContext, type userType } from "../AppContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const userRoute = api.user.getUser.useMutation();
+  const userRoute = api.user.loginUser.useMutation();
   const router = useRouter();
   const { setUser } = useContext(AppContext);
 
@@ -33,6 +27,7 @@ const LoginPage = () => {
 
       return;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userRoute, router]);
 
   const handleLoginSubmit = (e: MouseEvent<HTMLButtonElement>) => {

@@ -1,39 +1,40 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-"use client";
 import React, { useContext, useEffect, useState } from "react";
 import Pagination from "~/components/paginationController";
 import { api } from "~/utils/api";
-// import withAuth from "~/utils/withAuth";
-import { AppContext, userType } from "../AppContext";
+import { AppContext } from "../AppContext";
 import withAuth from "~/utils/withAuth";
-// import { getCategories } from '../api/categories'
 
 const CategoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const userRouteAddCategories = api.user.addCategories.useMutation();
   const userRouteRemoveCategories = api.user.removeCategories.useMutation();
-  const { user } = useContext(AppContext);
+
+  const { user ,token} = useContext(AppContext);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  
+
+  const fetcheduser = api.user.getUser.useQuery({token:token!},{enabled:!!token});
+
   useEffect(() => {
+   
     if (user) {
-      const userCategories:string[] | undefined = user?.categories?.map(
+      const userCategories: string[] | undefined = user?.categories?.map(
         (item) => item?.name,
       );
 
       userCategories && setSelectedCategories(userCategories);
+    } else{
+      const categories = fetcheduser.data?.data?.categories.map(
+        (item) => item?.name,
+      );
+      categories && setSelectedCategories(categories)
     }
-  }, [setSelectedCategories, user]);
+  }, [fetcheduser.data?.data?.categories, setSelectedCategories, user]);
 
-  const { data: categoriesArray, isLoading } = api.category.getCategories.useQuery({
-    skip: (currentPage - 1) * 6,
-    take: 6,
-  });
+  const { data: categoriesArray, isLoading } =
+    api.category.getCategories.useQuery({
+      skip: (currentPage - 1) * 6,
+      take: 6,
+    });
 
   const totalCount = api.category.getTotalCount.useQuery().data;
   const totalNumberOfPages = totalCount ? parseInt(`${totalCount / 6}`) : 1;
@@ -42,19 +43,18 @@ const CategoryPage = () => {
     const value = e.target.value;
     const isChecked = e.target.checked;
     const newSelectedValues = [...selectedCategories]; // Copy to avoid mutation
-
+    const fetcheduserId = fetcheduser.data?.data?.id;
+ 
     if (isChecked) {
       newSelectedValues.push(value);
-      user &&
-        userRouteAddCategories.mutate({
-          userId: parseInt(user?.id),
+      userRouteAddCategories.mutate({
+          userId: fetcheduserId!,
           categoryId: parseInt(e.target.id),
         });
     } else {
       newSelectedValues.splice(newSelectedValues.indexOf(value), 1);
-      user &&
-        userRouteRemoveCategories.mutate({
-          userId: parseInt(user?.id),
+      userRouteRemoveCategories.mutate({
+          userId: fetcheduserId!,
           categoryId: parseInt(e.target.id),
         });
     }
@@ -79,22 +79,23 @@ const CategoryPage = () => {
         <div className="mb-14 flex flex-col gap-6">
           <h2 className="mt-8 text-2xl font-medium">My Saved Interests</h2>
 
-          {!isLoading && categoriesArray?.map((category) => (
-            <div className="flex gap-4 " key={category.id}>
-              <input
-                checked={selectedCategories?.includes(`${category.name}`)}
-                onChange={(e) => handleCheckboxClick(e)}
-                className="bg-[#CCCCCC]"
-                type="checkbox"
-                id={`${category.id}`}
-                name={category.name}
-                value={category.name}
-              />
-              <label htmlFor={`${category.id}`}>{category.name}</label>
-            </div>
-          ))}
+          {!isLoading &&
+            categoriesArray?.map((category) => (
+              <div className="flex gap-4 " key={category.id}>
+                <input
+                  checked={selectedCategories?.includes(`${category.name}`)}
+                  onChange={(e) => handleCheckboxClick(e)}
+                  className="bg-[#CCCCCC]"
+                  type="checkbox"
+                  id={`${category.id}`}
+                  name={category.name}
+                  value={category.name}
+                />
+                <label htmlFor={`${category.id}`}>{category.name}</label>
+              </div>
+            ))}
 
-          {isLoading && <div className=" text-2xl h-60">Loading....</div>}
+          {isLoading && <div className=" h-60 text-2xl">Loading....</div>}
         </div>
 
         <Pagination
@@ -107,4 +108,4 @@ const CategoryPage = () => {
   );
 };
 
-export default withAuth( CategoryPage);
+export default withAuth(CategoryPage);
